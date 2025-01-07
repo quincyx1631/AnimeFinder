@@ -13,6 +13,28 @@ import {
 } from "./AnimeItem/animeApi";
 import { AnimeDetails, AnimeCharacter } from "./AnimeItem/anime";
 
+interface Anime {
+  mal_id: number;
+  title: string;
+  images: {
+    jpg: {
+      large_image_url: string;
+    };
+  };
+  score?: number;
+}
+
+export interface AnimeCharacterBox {
+  mal_id: number;
+  name: string;
+  images: {
+    jpg: {
+      large_image_url: string;
+    };
+  };
+  role: string;
+}
+
 function AnimeItem() {
   const { id } = useParams<{ id: string }>();
   const [anime, setAnime] = useState<AnimeDetails>({} as AnimeDetails);
@@ -85,14 +107,76 @@ function AnimeItem() {
       {/* Characters Section */}
       <div className="container my-5">
         <h3 className="text-center mb-4">Characters</h3>
-        <div className="row">
-          {characters.slice(0, 6).map((character) => (
-            <CharacterCard
-              key={character.character.mal_id}
-              character={character}
-            />
-          ))}
-        </div>
+        {characters.length > 0 ? (
+          <div
+            id="charactersCarousel"
+            className="carousel slide"
+            data-bs-ride="carousel"
+          >
+            <div className="carousel-inner">
+              {characters
+                .reduce((result: AnimeCharacterBox[][], character, index) => {
+                  const chunkIndex = Math.floor(index / 3);
+                  if (!result[chunkIndex]) result[chunkIndex] = [];
+                  result[chunkIndex].push({
+                    mal_id: character.character.mal_id,
+                    name: character.character.name,
+                    images: {
+                      jpg: {
+                        large_image_url:
+                          character.character.images.jpg.image_url,
+                      },
+                    },
+                    role: character.role,
+                  });
+                  return result;
+                }, [])
+                .map((slide, index) => (
+                  <div
+                    key={index}
+                    className={`carousel-item ${index === 0 ? "active" : ""}`}
+                  >
+                    <div className="row">
+                      {slide.map((character) => (
+                        <CharacterCard
+                          key={character.mal_id}
+                          character={character}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
+            <button
+              className="carousel-control-prev"
+              type="button"
+              data-bs-target="#charactersCarousel"
+              data-bs-slide="prev"
+            >
+              <span
+                className="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span className="visually-hidden">Previous</span>
+            </button>
+            <button
+              className="carousel-control-next"
+              type="button"
+              data-bs-target="#charactersCarousel"
+              data-bs-slide="next"
+            >
+              <span
+                className="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span className="visually-hidden">Next</span>
+            </button>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p>No characters available</p>
+          </div>
+        )}
       </div>
 
       {/* Recommendations Section */}
@@ -103,10 +187,58 @@ function AnimeItem() {
             <p>Loading recommendations...</p>
           </div>
         ) : recommendations.length > 0 ? (
-          <div className="row">
-            {recommendations.map((anime) => (
-              <RecommendationCard key={anime.mal_id} anime={anime} />
-            ))}
+          <div
+            id="recommendationsCarousel"
+            className="carousel slide"
+            data-bs-ride="carousel"
+          >
+            <div className="carousel-inner">
+              {recommendations
+                .reduce((result: Anime[][], anime, index) => {
+                  const chunkIndex = Math.floor(index / 3);
+                  if (!result[chunkIndex]) result[chunkIndex] = [];
+                  result[chunkIndex].push(anime);
+                  return result;
+                }, [])
+                .map((slide: Anime[], index: number) => (
+                  <div
+                    key={index}
+                    className={`carousel-item ${index === 0 ? "active" : ""}`}
+                  >
+                    <div className="row">
+                      {slide.map((anime) => (
+                        <div className="col-md-4" key={anime.mal_id}>
+                          <RecommendationCard anime={anime} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
+            <button
+              className="carousel-control-prev"
+              type="button"
+              data-bs-target="#recommendationsCarousel"
+              data-bs-slide="prev"
+            >
+              <span
+                className="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span className="visually-hidden">Previous</span>
+            </button>
+            <button
+              className="carousel-control-next"
+              type="button"
+              data-bs-target="#recommendationsCarousel"
+              data-bs-slide="next"
+            >
+              <span
+                className="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span className="visually-hidden">Next</span>
+            </button>
           </div>
         ) : (
           <div className="text-center">
