@@ -3,6 +3,7 @@ import Popular from "./Popular";
 import { useGlobalContext } from "../context/global";
 import Upcoming from "./Upcoming";
 import Airing from "./Airing";
+import { Link } from "react-router-dom";
 
 function Homepage() {
   const [rendered, setRendered] = React.useState("popular");
@@ -33,9 +34,10 @@ function Homepage() {
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
         <div className="container-fluid">
           {/* AnimeFinder (Left) */}
-          <a className="navbar-brand fw-bold text-primary" href="#">
+          {/* AnimeFinder logo with Link component */}
+          <Link to="/" className="navbar-brand fw-bold text-primary">
             AnimeFinder
-          </a>
+          </Link>
 
           {/* Toggle button for mobile view */}
           <button
